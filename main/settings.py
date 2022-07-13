@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -117,6 +118,45 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+PUBLIC_HOLIDAYS = [
+    # 2020
+    datetime.date(year=2020, month=1, day=1),
+    datetime.date(year=2020, month=1, day=13),
+    datetime.date(year=2020, month=2, day=11),
+    datetime.date(year=2020, month=2, day=23),
+    datetime.date(year=2020, month=2, day=24),
+    datetime.date(year=2020, month=3, day=20),
+    datetime.date(year=2020, month=4, day=29),
+    datetime.date(year=2020, month=5, day=3),
+    datetime.date(year=2020, month=5, day=4),
+    datetime.date(year=2020, month=5, day=5),
+    datetime.date(year=2020, month=7, day=20),
+    datetime.date(year=2020, month=8, day=11),
+    datetime.date(year=2020, month=9, day=21),
+    datetime.date(year=2020, month=9, day=22),
+    datetime.date(year=2020, month=10, day=12),
+    datetime.date(year=2020, month=11, day=3),
+    datetime.date(year=2020, month=11, day=23),
+
+    # 2021
+    datetime.date(year=2021, month=1, day=1),
+    datetime.date(year=2021, month=1, day=11),
+    datetime.date(year=2021, month=2, day=11),
+    datetime.date(year=2021, month=2, day=23),
+    datetime.date(year=2021, month=3, day=20),
+    datetime.date(year=2021, month=4, day=29),
+    datetime.date(year=2021, month=5, day=3),
+    datetime.date(year=2021, month=5, day=4),
+    datetime.date(year=2021, month=5, day=5),
+    datetime.date(year=2021, month=7, day=19),
+    datetime.date(year=2021, month=8, day=11),
+    datetime.date(year=2021, month=9, day=20),
+    datetime.date(year=2021, month=9, day=23),
+    datetime.date(year=2021, month=10, day=11),
+    datetime.date(year=2021, month=11, day=3),
+    datetime.date(year=2021, month=11, day=23),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
