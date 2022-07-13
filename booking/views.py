@@ -1,11 +1,11 @@
 from django.conf import settings
 import datetime
 from django.utils import timezone
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, TemplateView, CreateView
 from .models import Schedule, Store, Staff
 from django.db.models import Q
-from django.contrib import messages, redirects
+from django.contrib import messages
 
 class StoreList(ListView):
     model = Store
@@ -91,7 +91,7 @@ class Booking(CreateView):
         month = self.kwargs.get('month')
         day = self.kwargs.get('day')
         hour = self.kwargs.get('hour')
-        start = datetime.datetime(year=year, month=month, hour=hour)
+        start = datetime.datetime(year=year, month=month, day=day, hour=hour)
         end = datetime.datetime(year=year, month=month, day=day, hour=hour + 1)
         if Schedule.objects.filter(staff=staff, start=start).exists():
             messages.error(self.request, 'すみません、入れ違いで予約がありました。別の日はどうですか？')
@@ -101,6 +101,6 @@ class Booking(CreateView):
             schedule.start = start
             schedule.end = end
             schedule.save()
-        return redirects('calendar', pk=staff.pk, year=year, month=month, day=day)
+        return redirect('calendar', pk=staff.pk, year=year, month=month, day=day)
 
 # Create your views here.
