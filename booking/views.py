@@ -2,10 +2,10 @@ from django.conf import settings
 import datetime
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, TemplateView
-
+from django.views.generic import ListView, TemplateView, CreateView
 from .models import Schedule, Store, Staff
 from django.db.models import Q
+from django.contrib import messages, redirects
 
 class StoreList(ListView):
     model = Store
@@ -74,5 +74,33 @@ class StaffCalender(TemplateView):
         context['public_holidays'] = settings.PUBLIC_HOLIDAYS
 
         return context
+
+class Booking(CreateView):
+    model = Schedule
+    fields = ('name',)
+    template_name = 'booking/booking.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['staff'] = get_object_or_404(Staff, pk=self.kwargs['pk'])
+        return context
+
+    def form_valid(self, form):
+        staff = get_object_or_404(Staff, pk=self.kwargs['pk'])
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        day = self.kwargs.get('day')
+        hour = self.kwargs.get('hour')
+        start = datetime.datetime(year=year, month=month, hour=hour)
+        end = datetime.datetime(year=year, month=month, day=day, hour=hour + 1)
+        if Schedule.objects.filter(staff=staff, start=start).exists():
+            messages.error(self.request, 'すみません、入れ違いで予約がありました。別の日はどうですか？')
+        else:
+            schedule = form.save(commit=False)
+            schedule.staff = staff
+            schedule.start = start
+            schedule.end = end
+            schedule.save()
+        return redirects('calendar', pk=staff.pk, year=year, month=month, day=day)
 
 # Create your views here.

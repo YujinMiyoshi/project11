@@ -18,7 +18,7 @@
             {% endfor %}
             <td><a href="{% url 'calendar' staff.pk next.year next.month next.day %}">次週</a></td>
         </tr>
-        {% for hour, schedules in calender.items %}
+        {% for hour, schedules in calendar.items %}
             <tr style="font-size: 12px;">
                 <td>
                     {{ hour }}:00
@@ -28,7 +28,7 @@
                         {% if dt <= today %}
                             -
                         {% elif book %}
-                            <a href="{% url 'booking' staff.pk dt.year dt.month dt.hour %}">○</a>
+                            <a href="{% url 'booking' staff.pk dt.year dt.month dt.day hour %}">○</a>
                         {% else %}
                             ✕
                         {% endif %}
