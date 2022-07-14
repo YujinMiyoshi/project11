@@ -161,4 +161,10 @@ PUBLIC_HOLIDAYS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
+LOGIN_URL = 'login'
+
+LOGIN_REDIRECT_URL = 'store_list'
+
+LOGOUT_REDIRECT_URL = 'store_list'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
