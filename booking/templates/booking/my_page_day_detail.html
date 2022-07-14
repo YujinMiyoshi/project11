@@ -1,0 +1,23 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+    <h1>{{ staff.store.name }}店 {{ staff.name }}</h1>
+    <p>{{ view.kwargs.year }}年{{ view.kwargs.month }}月{{ view.kwargs.day }}日の予約一覧</p>
+    <table class="table table-borderd text-center" style="table-layout: fixed; width: 100%" border="1">
+        {% for hour, schedules in calendar.items %}
+            <tr style="font-size: 12px;">
+                <td>
+                    {{ hour }}:00
+                </td>
+                <td>
+                    {% if schedules %}
+                        {% for s in schedules %}
+                            {{ s.name }}
+                        {% endfor %}
+                    {% else %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -6,6 +6,10 @@ from django.views.generic import ListView, TemplateView, CreateView
 from .models import Schedule, Store, Staff
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class StoreList(ListView):
     model = Store
@@ -102,5 +106,69 @@ class Booking(CreateView):
             schedule.end = end
             schedule.save()
         return redirect('calendar', pk=staff.pk, year=year, month=month, day=day)
+
+class MyPage(LoginRequiredMixin, TemplateView):
+    template_name = 'booking/my_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['staff_list'] = Staff.objects.filter(user=self.request.user).order_by('name')
+        context['schedule_list'] = Schedule.objects.filter(staff__user=self.request.user, start__gte=timezone.now()).order_by('name')
+        return context
+
+class OnlyUserMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        return self.kwargs['pk'] == self.request.user.pk or self.request.user.is_superuser
+
+class MyPageWithPk(OnlyUserMixin, TemplateView):
+    template_name = 'booking/my_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = get_object_or_404(User, pk=self.kwargs['pk'])
+        context['staff_list'] = Staff.objects.filter(user__pk=self.kwargs['pk']).order_by('name')
+        context['schedule_list'] = Schedule.objects.filter(staff__user__pk=self.kwargs['pk'], start__gte=timezone.now()).order_by('name')
+        return context
+
+class OnlyStaffMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        staff = get_object_or_404(Staff, pk=self.kwargs['pk'])
+        return staff.user == self.request.user or self.request.user.is_superuser
+
+class MyPageCalendar(OnlyStaffMixin, StaffCalender):
+    template_name = 'booking/my_page_calendar.html'
+
+class MyPageDetail(OnlyStaffMixin,TemplateView):
+    template_name = 'booking/my_page_day_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pk = self.kwargs['pk']
+        staff = get_object_or_404(Staff, pk=pk)
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        day = self.kwargs.get('day')
+        date = datetime.date(year=year, month=month, day=day)
+
+        calendar = {}
+        for hour in range(9, 18):
+            calendar[hour] = []
+
+        start_time = datetime.datetime.combine(date, datetime.time(hour=9, minute=0, second=0))
+        end_time = datetime.datetime.combine(date, datetime.time(hour=17, minute=0, second=0))
+        for schedule in Schedule.objects.filter(staff=staff).exclude(Q(start__gt=end_time) | Q(end__lt=start_time)):
+            local_dt = timezone.localtime(schedule.start)
+            booking_date = local_dt.date()
+            booking_hour = local_dt.hour
+            if booking_hour in calendar:
+                calendar[booking_hour].append(schedule)
+
+        context['calendar'] = calendar
+        context['staff'] = staff
+        return context
 
 # Create your views here.

@@ -23,12 +23,12 @@
                 <td>
                     {{ hour }}:00
                 </td>
-                {% for dt, book in schedules.items %}
+                {% for day, book in schedules.items %}
                     <td>
-                        {% if dt <= today %}
+                        {% if day <= today %}
                             -
                         {% elif book %}
-                            <a href="{% url 'booking' staff.pk dt.year dt.month dt.day hour %}">○</a>
+                            <a href="{% url 'booking' staff.pk day.year day.month day.day hour %}">○</a>
                         {% else %}
                             ✕
                         {% endif %}
