@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import StoreList, StaffList, StaffCalender, Booking, MyPage, MyPageWithPk, MyPageCalendar, MyPageDetail
+from .views import StoreList, StaffList, StaffCalender, Booking, MyPage, MyPageWithPk, MyPageCalendar, MyPageDetail, MyPageSchedule, MyPageScheduleDelete, my_page_holiday_add
 from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
@@ -15,4 +15,7 @@ urlpatterns = [
     path('mypage/<int:pk>/calendar/', MyPageCalendar.as_view(), name='my_page_calendar'),
     path('mypage/<int:pk>/calendar/<int:year>/<int:month>/<int:day>', MyPageCalendar.as_view(), name='my_page_calendar'),
     path('mypage/<int:pk>/detail/<int:year>/<int:month>/<int:day>/', MyPageDetail.as_view(), name='my_page_day_detail'),
+    path('mypage/schedule/<int:pk>/', MyPageSchedule.as_view(), name='my_page_schedule'),
+    path('mypage/schedule/<int:pk>/delete/', MyPageScheduleDelete.as_view(), name='my_page_schedule_delete'),
+    path('mypage/holiday/add/<int:pk>/<int:year>/<int:month>/<int:day>/<int:hour>/', my_page_holiday_add, name='my_page_holiday_add'),
 ]

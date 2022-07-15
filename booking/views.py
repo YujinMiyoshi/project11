@@ -2,12 +2,15 @@ from django.conf import settings
 import datetime
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, TemplateView, CreateView
+from django.views.generic import ListView, TemplateView, CreateView, UpdateView, DeleteView
 from .models import Schedule, Store, Staff
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
+from django.core.exceptions import PermissionDenied
+from django.views.decorators.http import require_POST
 
 User = get_user_model()
 
@@ -170,5 +173,32 @@ class MyPageDetail(OnlyStaffMixin,TemplateView):
         context['calendar'] = calendar
         context['staff'] = staff
         return context
+
+class OnlyScheduleMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        schedule = get_object_or_404(Schedule, pk=self.kwargs['pk'])
+        return schedule.staff.user == self.request.user or self.request.user.is_superuser
+
+class MyPageSchedule(OnlyScheduleMixin, UpdateView):
+    model = Schedule
+    fields = ('start', 'end', 'name')
+    success_url = reverse_lazy('my_page')
+
+class MyPageScheduleDelete(OnlyScheduleMixin, DeleteView):
+    model = Schedule
+    success_url = reverse_lazy('my_page')
+
+@require_POST
+def my_page_holiday_add(request, pk, year, month, day, hour):
+    staff = get_object_or_404(Staff, pk=pk)
+    if staff.user == request.user or request.user.is_superuser:
+        start = datetime.datetime(year=year, month=month, day=day, hour=hour)
+        end = datetime.datetime(year=year, month=month, day=day, hour=hour + 1)
+        Schedule.objects.create(staff=staff, start=start, end=end, name='休暇(システムによる追加)')
+        return redirect('my_page_day_detail', pk=pk, year=year, month=month, day=day)
+
+    raise PermissionDenied
 
 # Create your views here.
