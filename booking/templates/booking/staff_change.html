@@ -1,7 +1,7 @@
 {% extends 'booking/base.html' %}
 
 {% block content %}
-    <h1>源氏名・所属店舗の変更</h1>
+    <h1>源氏名・所属店舗の削除</h1>
     {% for staff in staff_list %}
         <p><a href="{% url 'staff_delete' staff.pk %}">{{ staff }}</a></p>
     {% endfor %}

@@ -254,7 +254,8 @@ class StaffChange(OnlyUserMixin, TemplateView):
 class StaffDelete(OnlyStaffMixin, DeleteView):
     model = Staff
     template_name = 'booking/staff_delete.html'
-    success_url = reverse_lazy('my_page')
 
+    def get_success_url(self):
+        return reverse_lazy("staff_change", kwargs={"pk": self.request.user.pk})
 
 # Create your views here.
