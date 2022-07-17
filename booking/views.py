@@ -7,10 +7,11 @@ from .models import Schedule, Store, Staff
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, authenticate
 from django.urls import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
+from django.contrib.auth.forms import UserCreationForm
 
 User = get_user_model()
 
@@ -200,5 +201,60 @@ def my_page_holiday_add(request, pk, year, month, day, hour):
         return redirect('my_page_day_detail', pk=pk, year=year, month=month, day=day)
 
     raise PermissionDenied
+
+class SignUp(CreateView):
+    template_name = 'booking/signup.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('signedup')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password1")
+        user = authenticate(username=username, password=password)
+        login(self.request, user)
+        return response
+
+class SignedUp(TemplateView):
+    template_name = 'booking/signedup.html'
+
+class AddStaff(OnlyUserMixin, CreateView):
+    model = Staff
+    fields = ('name', 'store')
+    success_url = reverse_lazy('my_page')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+class AddStoreError(TemplateView):
+    template_name = 'booking/addstore_error.html'
+
+class AddStaffStore(OnlyUserMixin, CreateView):
+    model = Staff
+    fields = ('name', 'store')
+    success_url = reverse_lazy('my_page')
+
+    def form_valid(self, form):
+        try:
+            form.instance.user = self.request.user
+            return super().form_valid(form)
+        except:
+            return redirect('addstore_error')
+
+class StaffChange(OnlyUserMixin, TemplateView):
+    model = Staff
+    template_name = 'booking/staff_change.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['staff_list'] = Staff.objects.filter(user = self.request.user)
+        return context
+
+class StaffDelete(OnlyStaffMixin, DeleteView):
+    model = Staff
+    template_name = 'booking/staff_delete.html'
+    success_url = reverse_lazy('my_page')
+
 
 # Create your views here.

@@ -1,7 +1,7 @@
 {% extends 'booking/base.html' %}
 {% block content %}
     <h1>{{ user.username }}のMyPage</h1>
-    <h2>所属店舗</h2>
+    <h2>所属店舗のスケジュール</h2>
     <ul>
         {% for staff in staff_list %}
         <li><a href="{% url 'my_page_calendar' staff.pk %}">{{ staff }}</a></li>
@@ -17,4 +17,9 @@
             <li>予約はありません。</li>
         {% endfor %}
     </ul>
+        {% if staff_list %}
+            <h2>源氏名・所属店舗の<a href="{% url 'add_store' user.pk %}">追加</a>と<a href="{% url 'staff_change' user.pk %}">削除</a></h2>
+        {% else %}
+            <h2>源氏名・所属店舗の<a href="{% url 'add_staff' user.pk %}">作成</a></h2>
+        {% endif %}
 {% endblock %}

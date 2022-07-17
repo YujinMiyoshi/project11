@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width = device-width, initial-scale=1, shrink-to-fit=no">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>予約サイト</title>
+        <title>俺　風〇店　無理???</title>
         <style>
             body{
                 width: 960px;
@@ -19,11 +19,13 @@
     <body>
         <nav>
             <a href="{% url 'store_list' %}">Home</a>
+            <a href="https://youtu.be/y_S8Eym6VZI">プロモーションビデオ</a>
             {% if user.is_authenticated %}
                 <a href="{% url 'my_page' %}">MyPage</a>
                 <a href="{% url 'logout' %}">Logout</a>
             {% else %}
             <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'signup' %}">私たちと働きたい方はこちら</a>
             {% endif %}
         </nav>
         {% for message in messages %}
