@@ -1,5 +1,5 @@
 __pycache__/
-db.splite3
+#db.splite3
 myenv
 local_settings.py
 staticfiles
